@@ -62,9 +62,10 @@ export default function Home() {
         const x = parseInt(e.clientX - rect.left);
         const y = parseInt(e.clientY - rect.top);
 
-        // TODO: allow user to format copy
         let cpTxt = code.replace("#x", x);
         cpTxt = cpTxt.replace("#y", y);
+
+        clearTimeout(notifTimeoutRef.current);
         navigator.clipboard.writeText(cpTxt).then(
           () => {
             setShowCopyNotif(true);
@@ -81,7 +82,7 @@ export default function Home() {
       current.addEventListener("click", handleClick, false);
     }
     return () => {};
-  }, [canvasRef]);
+  }, [canvasRef, code]);
 
   useEffect(() => {
     const context = canvasRef.current.getContext("2d");
@@ -137,17 +138,94 @@ export default function Home() {
     });
   };
 
+  const handleCodeChange = (code) => {
+    setCode(code);
+  };
+
   const handleCloseNotif = () => {
     setShowCopyNotif(false);
     clearTimeout(notifTimeoutRef.current);
   };
+
+  const renderInputs = () => {
+    return (
+      <div>
+        <div className="d-flex">
+          <FileInput
+            onChange={handleUpload}
+            className="mt-4  mb-2 width-input"
+          />
+          <div className="d-flex align-items-center ml-3"></div>
+        </div>
+        <span>{file ? `Filename: ${file.name}` : ""}</span>
+
+        <div className="input-group mt-2 width-input">
+          <div className="input-group-prepend">
+            <button
+              className={`btn ${
+                !scale && form.width ? "btn-info" : "btn-outline-secondary "
+              }`}
+              type="button"
+              onClick={toggleScale}
+              disabled={!imgEl || !form.width}
+            >
+              {scale ? "Undo scale" : "Scale by width (px)"}
+            </button>
+          </div>
+          <input
+            type="number"
+            className="form-control"
+            value={form.width}
+            onChange={handleChange}
+            disabled={!imgEl}
+          />
+        </div>
+        {imgEl && (
+          <p className="mt-4">Click anywhere on the image copy coordinates!</p>
+        )}
+      </div>
+    );
+  };
+
+  const renderEditor = () => {
+    return (
+      <div className="editor-container mt-4">
+        <p>Format the copied co-ordinates!</p>
+        <p>
+          Simply include the macros <b>#x</b> and <b>#y</b> which will be
+          substituted by the <i> x</i> and
+          <i> y</i> co-ordinates, respectively
+        </p>
+        <Editor
+          value={code}
+          className="editor"
+          onValueChange={handleCodeChange}
+          highlight={(code) => highlight(code, languages.js)}
+          padding={10}
+          style={{
+            fontFamily: '"Fira code", "Fira Mono", monospace',
+            fontSize: 12,
+            backgroundColor: "#ededed",
+            width: 250,
+          }}
+        />
+        <style jsx>
+          {`
+            .editor-container {
+              margin-left: 50px;
+            }
+          `}
+        </style>
+      </div>
+    );
+  };
+
   return (
     <div>
       <Head>
         <title>Get Coords</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
       <main className="container-fluid">
         <BaseToast
           show={showCopyNotif}
@@ -155,97 +233,15 @@ export default function Home() {
           handleClose={handleCloseNotif}
         />
         <div className="d-flex">
-          <div>
-            <div className="d-flex">
-              <FileInput onChange={handleUpload} className="width-input" />
-              <div className="d-flex align-items-center ml-3">
-                <span>{file ? file.name : ""}</span>
-              </div>
-            </div>
-            <div className="input-group mb-3 width-input">
-              <div className="input-group-prepend">
-                <button
-                  className={`btn ${
-                    !scale && form.width ? "btn-info" : "btn-outline-secondary "
-                  }`}
-                  type="button"
-                  onClick={toggleScale}
-                  disabled={!imgEl || !form.width}
-                >
-                  {scale ? "Undo scale" : "Scale by width (px)"}
-                </button>
-              </div>
-              <input
-                type="number"
-                className="form-control "
-                value={form.width}
-                onChange={handleChange}
-                disabled={!imgEl}
-              />
-            </div>
-            <p>Click anywhere on the image copy coordinates!</p>
-          </div>
-          <div className="editor-container mt-4">
-            <p>Format the copy!</p>
-            <p>
-              Use <b>#x</b> to substitue the <i>x</i> co-ordinate and <b>#y</b>{" "}
-              for
-              <i> y</i>
-            </p>
-            <Editor
-              value={code}
-              onValueChange={(code) => setCode(code)}
-              highlight={(code) => highlight(code, languages.js)}
-              padding={10}
-              style={{
-                fontFamily: '"Fira code", "Fira Mono", monospace',
-                fontSize: 12,
-                backgroundColor: "#ededed",
-              }}
-            />
-          </div>
+          {renderInputs()}
+          {renderEditor()}
         </div>
 
-        <canvas id="canvas" className="canvas" ref={canvasRef}></canvas>
+        <canvas id="canvas" ref={canvasRef}></canvas>
         <div ref={resultsRef}>
           Move mouse over image to show mouse location and pixel value and alpha
         </div>
       </main>
-
-      <style jsx>{`
-        .canvas {
-          margin: 12px;
-        }
-
-        input[type="file"] {
-          display: none;
-        }
-
-        .custom-file-upload {
-          border: 1px solid #ccc;
-          display: inline-block;
-          padding: 6px 12px;
-          cursor: pointer;
-        }
-
-        .custom-file-label {
-          cursor: pointer;
-        }
-
-        .editor-container {
-          margin-left: 50px;
-        }
-
-        footer {
-          position: fixed;
-          bottom: 0;
-          left: 0;
-          margin: 0 auto;
-          background: #0072bb;
-          color: #fff;
-        }
-      `}</style>
-
       <style jsx global>{`
         html,
         body {
@@ -260,9 +256,8 @@ export default function Home() {
         * {
           box-sizing: border-box;
         }
-
         .width-input {
-          width: 350px;
+          width: 300px;
         }
       `}</style>
     </div>
