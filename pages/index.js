@@ -227,7 +227,6 @@ export default function Home() {
           by the <i> x</i> and
           <i> y</i> co-ordinates, respectively.
         </p>
-
         <Editor
           value={code}
           onValueChange={handleCodeChange}
