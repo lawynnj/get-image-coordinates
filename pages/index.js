@@ -1,6 +1,7 @@
 import Head from "next/head";
 import { useState, useRef, useEffect } from "react";
 import BaseToast from "../components/Toast";
+
 export default function Home() {
   const canvasRef = useRef();
   const resultsRef = useRef();
@@ -8,6 +9,7 @@ export default function Home() {
   const [scale, setScale] = useState(false);
   const [imgEl, setImgEl] = useState(null);
   const [showCopyNotif, setShowCopyNotif] = useState(false);
+  const [file, setFile] = useState(null);
   useEffect(() => {
     if (canvasRef) {
       const { current } = canvasRef;
@@ -70,6 +72,7 @@ export default function Home() {
   }, [canvasRef, scale, imgEl]);
 
   const handleUpload = (e) => {
+    setFile(e.target.files[0]);
     const url = URL.createObjectURL(e.target.files[0]);
     const img = new Image();
     const context = canvasRef.current.getContext("2d");
@@ -107,9 +110,20 @@ export default function Home() {
 
       <main className="container-fluid">
         <BaseToast show={showCopyNotif} text="Copied!" />
-        <p>
-          Open image: <input type="file" onChange={handleUpload} />
-        </p>
+        <div className="d-flex">
+          <div className="input-group mb-3 width-input mt-4">
+            <div className="custom-file">
+              <input id="file-upload" type="file" onChange={handleUpload} />
+              <label className="custom-file-label" htmlFor="file-upload">
+                Choose file
+              </label>
+              <p></p>
+            </div>
+          </div>
+          <div className="d-flex align-items-center ml-3">
+            <span>{file ? file.name : ""}</span>
+          </div>
+        </div>
 
         <div className="input-group mb-3 width-input">
           <div className="input-group-prepend">
@@ -121,6 +135,7 @@ export default function Home() {
               {scale ? "Unscale" : "Scale"} image
             </button>
           </div>
+
           <input
             type="number"
             className="form-control "
@@ -142,6 +157,21 @@ export default function Home() {
 
         .width-input {
           width: 300px;
+        }
+
+        input[type="file"] {
+          display: none;
+        }
+
+        .custom-file-upload {
+          border: 1px solid #ccc;
+          display: inline-block;
+          padding: 6px 12px;
+          cursor: pointer;
+        }
+
+        .custom-file-label {
+          cursor: pointer;
         }
 
         footer {
