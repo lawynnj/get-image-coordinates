@@ -17,6 +17,7 @@ export default function Home() {
   const [form, setForm] = useState({ width: 0 });
   const [scale, setScale] = useState(false);
   const [imgEl, setImgEl] = useState(null);
+  const [showTip, setShowTip] = useState(true);
   const [showCopyNotif, setShowCopyNotif] = useState(false);
   const [file, setFile] = useState(null);
 
@@ -148,6 +149,31 @@ export default function Home() {
     clearTimeout(notifTimeoutRef.current);
   };
 
+  const renderTip = () => {
+    if (showTip) {
+      return (
+        <div className="alert alert-light border">
+          <p>
+            Get image coordinates is a tool that allows you to get x and y
+            co-ordinates of an image by using your mouse. Simply upload an
+            image, adjust the width by adding a scale (optional), and start
+            hovering and clicking! If you need to format the co-ordinates you
+            can do so in the editor.
+          </p>
+          <button
+            className="btn btn-outline-primary"
+            onClick={() => setShowTip(false)}
+          >
+            {" "}
+            Hide{" "}
+          </button>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   const renderInputs = () => {
     return (
       <div>
@@ -230,28 +256,15 @@ export default function Home() {
         <title>Get Coords</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="container-fluid">
+      <main className="container-fluid pt-4">
         <BaseToast
           show={showCopyNotif}
           text="Copied!"
           handleClose={handleCloseNotif}
           className="toast-container"
         />
-
+        {renderTip()}
         <div className="d-flex">
-          {/* <div className="alert alert-info">
-          <p>
-            Get image coordinates is a tool that allows you to get x and y
-            co-ordinates of an image by using your mouse.
-          </p>
-          <p>
-            Simply upload an image, adjust the width by adding a scale
-            (optional), and start hovering and clicking!
-          </p>
-          <p>
-            If you need to format the co-ordinates you can do so in the editor.
-          </p>
-        </div> */}
           {renderInputs()}
           {renderEditor()}
         </div>
