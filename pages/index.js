@@ -8,10 +8,18 @@ import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
 import Form from "react-bootstrap/Form";
 const initCode = `[#x, #y]`;
+const exampleFormat = `{
+  coordinateX: #x,
+  coordinateY: #y
+}`;
+
+const exampleFormat2 = `{
+  coordinateX: 3,
+  coordinateY: 5
+}`;
 
 export default function Home() {
   const canvasRef = useRef();
-  const resultsRef = useRef();
   const notifTimeoutRef = useRef(false);
 
   const [form, setForm] = useState({ width: 0, showColor: true });
@@ -102,11 +110,13 @@ export default function Home() {
   }, [canvasRef, scale, imgEl]);
 
   const draw = (img, context, w, h, sw = null, sh = null) => {
-    canvasRef.current.width = w;
-    canvasRef.current.height = h;
     if (sw !== null && sh !== null) {
+      canvasRef.current.width = sw;
+      canvasRef.current.height = sh;
       context.drawImage(img, 0, 0, sw, sh);
     } else {
+      canvasRef.current.width = w;
+      canvasRef.current.height = h;
       context.drawImage(img, 0, 0);
     }
   };
@@ -121,6 +131,7 @@ export default function Home() {
       setImgEl(img);
       img.onload = () => {
         if (scale === true) {
+          context.clearRect(0, 0, context.canvas.width, context.canvas.height);
           const sH = (img.height / img.width) * form.width;
           draw(img, context, img.width, img.height, form.width, sH);
         } else {
@@ -157,9 +168,9 @@ export default function Home() {
           <p>
             Get image coordinates is a tool that allows you to get x and y
             co-ordinates of an image by using your mouse. Simply upload an
-            image, adjust the width by adding a scale (optional), and start
-            hovering and clicking! If you need to format the co-ordinates you
-            can do so in the editor.
+            image, adjust the width by adding a scale (optional), and click on a
+            point to copy co-ordinates. You can format how the co-ordinates are
+            copied in the editor.
           </p>
           <button
             className="btn btn-outline-primary"
@@ -188,31 +199,23 @@ export default function Home() {
         <span>{file ? `Filename: ${file.name}` : ""}</span>
 
         <div className="input-group mt-2 width-input">
-          <div className="input-group-prepend">
-            <button
-              className={`btn ${
-                !scale && form.width ? "btn-primary" : "btn-outline-secondary "
-              }`}
-              type="button"
-              onClick={toggleScale}
-              disabled={!imgEl || !form.width}
-            >
-              {scale ? "Undo scale" : "Scale by width (px)"}
-            </button>
-          </div>
           <input
             type="number"
             className="form-control"
             value={form.width}
             onChange={handleChange}
-            disabled={!imgEl}
           />
+          <div className="input-group-prepend">
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={toggleScale}
+            >
+              {scale ? "Undo scale" : "Scale by width (px)"}
+            </button>
+          </div>
         </div>
-        {imgEl && (
-          <p className="mt-4">
-            Click anywhere on the image to copy coordinates!
-          </p>
-        )}
+        <p className="mt-4">Click anywhere on the image to copy coordinates!</p>
       </div>
     );
   };
@@ -220,25 +223,70 @@ export default function Home() {
   const renderEditor = () => {
     return (
       <div className="editor-container mt-4">
-        <h4>Formatting</h4>
-        <p>Format how the co-ordinates are copied!</p>
-        <p>
-          Simply include the keys <b>#x</b> and <b>#y</b> which will be replaced
-          by the <i> x</i> and
-          <i> y</i> co-ordinates, respectively.
-        </p>
-        <Editor
-          value={code}
-          onValueChange={handleCodeChange}
-          highlight={(code) => highlight(code, languages.js)}
-          padding={10}
-          style={{
-            fontFamily: '"Fira code", "Fira Mono", monospace',
-            fontSize: 12,
-            backgroundColor: "#ededed",
-            width: 250,
-          }}
-        />
+        <div className="d-flex">
+          <div className="mr-2 px-4">
+            <h4>Format the copy</h4>
+            <p>
+              Update the text in the gray text field to update the format of the
+              copied the co-ordinates
+            </p>
+            <p>
+              When using your own format include the keys <b>#x</b> and{" "}
+              <b>#y</b>. They will be replaced by the <i> x</i> and
+              <i> y</i> co-ordinates, respectively.
+            </p>
+            <Editor
+              value={code}
+              onValueChange={handleCodeChange}
+              highlight={(code) => highlight(code, languages.js)}
+              padding={10}
+              style={{
+                fontFamily: '"Fira code", "Fira Mono", monospace',
+                fontSize: 12,
+                backgroundColor: "#ededed",
+                width: 250,
+                marginRight: 10,
+              }}
+            />
+          </div>
+          <div className="px-4">
+            <h4>Copy format example</h4>
+            <div className="d-flex">
+              <div>
+                <span>Format input: </span>
+                <Editor
+                  value={exampleFormat}
+                  highlight={(code) => highlight(code, languages.js)}
+                  padding={10}
+                  style={{
+                    fontFamily: '"Fira code", "Fira Mono", monospace',
+                    fontSize: 12,
+                    backgroundColor: "#ededed",
+                    width: 250,
+                    marginRight: 10,
+                  }}
+                  disabled
+                />
+              </div>
+              <div>
+                <span>Copy Output:</span>
+                <Editor
+                  value={exampleFormat2}
+                  highlight={(code) => highlight(code, languages.js)}
+                  padding={10}
+                  style={{
+                    fontFamily: '"Fira code", "Fira Mono", monospace',
+                    fontSize: 12,
+                    backgroundColor: "#ededed",
+                    width: 250,
+                  }}
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
         <style jsx>
           {`
             .editor-container {
@@ -269,7 +317,7 @@ export default function Home() {
           {renderInputs()}
           {renderEditor()}
         </div>
-
+        <hr />
         <canvas id="canvas" ref={canvasRef}></canvas>
         <Form.Group controlId="formBasicCheckbox">
           <Form.Check
