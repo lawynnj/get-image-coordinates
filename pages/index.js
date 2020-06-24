@@ -188,8 +188,9 @@ export default function Home() {
           <div className="editor-container mt-4">
             <p>Format the copy!</p>
             <p>
-              Use <b>#x</b> to substitue <i>x</i> co-ordinate and <b>#y</b> for
-              <i>y</i>
+              Use <b>#x</b> to substitue the <i>x</i> co-ordinate and <b>#y</b>{" "}
+              for
+              <i> y</i>
             </p>
             <Editor
               value={code}
