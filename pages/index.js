@@ -2,6 +2,12 @@ import Head from "next/head";
 import { useState, useRef, useEffect } from "react";
 import BaseToast from "../components/Toast";
 import FileInput from "../components/FileInput";
+import Editor from "react-simple-code-editor";
+import { highlight, languages } from "prismjs/components/prism-core";
+import "prismjs/components/prism-clike";
+import "prismjs/components/prism-javascript";
+
+const initCode = `[#x, #y]`;
 
 export default function Home() {
   const canvasRef = useRef();
@@ -14,6 +20,7 @@ export default function Home() {
   const [showCopyNotif, setShowCopyNotif] = useState(false);
   const [file, setFile] = useState(null);
 
+  const [code, setCode] = useState(initCode);
   // clear timeout
   useEffect(() => {
     return () => {
@@ -56,9 +63,9 @@ export default function Home() {
         const y = parseInt(e.clientY - rect.top);
 
         // TODO: allow user to format copy
-        const copyText = x + ";" + y;
-
-        navigator.clipboard.writeText(copyText).then(
+        let cpTxt = code.replace("#x", x);
+        cpTxt = cpTxt.replace("#y", y);
+        navigator.clipboard.writeText(cpTxt).then(
           () => {
             setShowCopyNotif(true);
             notifTimeoutRef.current = setTimeout(
@@ -159,7 +166,7 @@ export default function Home() {
               <div className="input-group-prepend">
                 <button
                   className={`btn ${
-                    !scale ? "btn-info" : "btn-outline-secondary "
+                    !scale && form.width ? "btn-info" : "btn-outline-secondary "
                   }`}
                   type="button"
                   onClick={toggleScale}
@@ -178,7 +185,24 @@ export default function Home() {
             </div>
             <p>Click anywhere on the image copy coordinates!</p>
           </div>
-          <div>Format the copy!</div>
+          <div className="editor-container mt-4">
+            <p>Format the copy!</p>
+            <p>
+              Use <b>#x</b> to substitue <i>x</i> co-ordinate and <b>#y</b> for
+              <i>y</i>
+            </p>
+            <Editor
+              value={code}
+              onValueChange={(code) => setCode(code)}
+              highlight={(code) => highlight(code, languages.js)}
+              padding={10}
+              style={{
+                fontFamily: '"Fira code", "Fira Mono", monospace',
+                fontSize: 12,
+                backgroundColor: "#ededed",
+              }}
+            />
+          </div>
         </div>
 
         <canvas id="canvas" className="canvas" ref={canvasRef}></canvas>
@@ -205,6 +229,10 @@ export default function Home() {
 
         .custom-file-label {
           cursor: pointer;
+        }
+
+        .editor-container {
+          margin-left: 50px;
         }
 
         footer {
