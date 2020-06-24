@@ -1,8 +1,8 @@
 import Toast from "react-bootstrap/Toast";
 
-const BaseToast = ({ show, text, handleClose }) => {
+const BaseToast = ({ show, text, handleClose, className }) => {
   return (
-    <div className="base-toast">
+    <div className={`base-toast ${className}`}>
       <Toast show={show} onClose={handleClose}>
         <Toast.Header>
           <strong className="mr-auto">{text}</strong>
@@ -10,15 +10,11 @@ const BaseToast = ({ show, text, handleClose }) => {
       </Toast>
       <style jsx>{`
         .base-toast {
-          position: absolute;
+          position: fixed;
           top: 0;
           right: 50%;
           margin-top: 10px;
           margin-right: 10px;
-        }
-
-        .toast-container {
-          position: relative;
         }
       `}</style>
     </div>

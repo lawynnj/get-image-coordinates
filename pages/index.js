@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { useState, useRef, useEffect } from "react";
-import BaseToast from "../components/Toast";
+import BaseToast from "../components/BaseToast";
 import FileInput from "../components/FileInput";
 import Editor from "react-simple-code-editor";
 import { highlight, languages } from "prismjs/components/prism-core";
@@ -154,7 +154,7 @@ export default function Home() {
         <div className="d-flex">
           <FileInput
             onChange={handleUpload}
-            className="mt-4  mb-2 width-input"
+            className="mt-4 mb-2 width-input"
           />
           <div className="d-flex align-items-center ml-3"></div>
         </div>
@@ -193,6 +193,7 @@ export default function Home() {
   const renderEditor = () => {
     return (
       <div className="editor-container mt-4">
+        <h4>Formatting</h4>
         <p>Format how the co-ordinates are copied!</p>
         <p>
           Simply include the macros <b>#x</b> and <b>#y</b> which will be
@@ -201,7 +202,6 @@ export default function Home() {
         </p>
         <Editor
           value={code}
-          className="editor"
           onValueChange={handleCodeChange}
           highlight={(code) => highlight(code, languages.js)}
           padding={10}
@@ -216,6 +216,7 @@ export default function Home() {
           {`
             .editor-container {
               margin-left: 50px;
+              z-index: 1;
             }
           `}
         </style>
@@ -234,8 +235,23 @@ export default function Home() {
           show={showCopyNotif}
           text="Copied!"
           handleClose={handleCloseNotif}
+          className="toast-container"
         />
+
         <div className="d-flex">
+          {/* <div className="alert alert-info">
+          <p>
+            Get image coordinates is a tool that allows you to get x and y
+            co-ordinates of an image by using your mouse.
+          </p>
+          <p>
+            Simply upload an image, adjust the width by adding a scale
+            (optional), and start hovering and clicking!
+          </p>
+          <p>
+            If you need to format the co-ordinates you can do so in the editor.
+          </p>
+        </div> */}
           {renderInputs()}
           {renderEditor()}
         </div>
@@ -261,6 +277,10 @@ export default function Home() {
         }
         .width-input {
           width: 300px;
+        }
+
+        .toast-container {
+          z-index: 999;
         }
       `}</style>
     </div>
