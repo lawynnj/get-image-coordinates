@@ -6,7 +6,7 @@ import Editor from "react-simple-code-editor";
 import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
-
+import Form from "react-bootstrap/Form";
 const initCode = `[#x, #y]`;
 
 export default function Home() {
@@ -14,13 +14,20 @@ export default function Home() {
   const resultsRef = useRef();
   const notifTimeoutRef = useRef(false);
 
-  const [form, setForm] = useState({ width: 0 });
+  const [form, setForm] = useState({ width: 0, showColor: true });
   const [scale, setScale] = useState(false);
   const [imgEl, setImgEl] = useState(null);
   const [showTip, setShowTip] = useState(true);
   const [showCopyNotif, setShowCopyNotif] = useState(false);
   const [file, setFile] = useState(null);
-
+  const [data, setData] = useState({
+    x: 0,
+    y: 0,
+    r: 0,
+    g: 0,
+    b: 0,
+    a: 0,
+  });
   const [code, setCode] = useState(initCode);
   // clear timeout
   useEffect(() => {
@@ -40,21 +47,14 @@ export default function Home() {
         const x = parseInt(e.clientX - rect.left);
         const y = parseInt(e.clientY - rect.top);
         const p = context.getImageData(x, y, 1, 1).data;
-
-        resultsRef.current.innerHTML =
-          '<table style="width:100%;table-layout:fixed"><td>X: ' +
-          x +
-          "</td><td>Y: " +
-          y +
-          "</td><td>Red: " +
-          p[0] +
-          "</td><td>Green: " +
-          p[1] +
-          "</td><td>Blue: " +
-          p[2] +
-          "</td><td>Alpha: " +
-          p[3] +
-          "</td></table>";
+        setData({
+          x,
+          y,
+          r: p[0],
+          g: p[1],
+          b: p[2],
+          a: p[3],
+        });
         return { x, y };
       };
 
@@ -136,6 +136,7 @@ export default function Home() {
 
   const handleChange = (e) => {
     setForm({
+      ...form,
       width: e.target.value,
     });
   };
@@ -270,8 +271,27 @@ export default function Home() {
         </div>
 
         <canvas id="canvas" ref={canvasRef}></canvas>
-        <div ref={resultsRef}>
-          Move mouse over image to show mouse location and pixel value and alpha
+        <Form.Group controlId="formBasicCheckbox">
+          <Form.Check
+            type="checkbox"
+            label="Show colors"
+            onChange={() => setForm({ ...form, showColor: !form.showColor })}
+            checked={form.showColor}
+          />
+        </Form.Group>
+        <div>
+          <div className="d-flex w-50">
+            <div>X: {data.x} </div>
+            <div className="ml-4">Y: {data.y} </div>
+            {form.showColor && (
+              <>
+                <div className="ml-4">Red: {data.r} </div>
+                <div className="ml-4">Green: {data.g} </div>
+                <div className="ml-4">Blue: {data.b} </div>
+                <div className="ml-4">Alpha: {data.a} </div>
+              </>
+            )}
+          </div>
         </div>
       </main>
       <style jsx global>{`
