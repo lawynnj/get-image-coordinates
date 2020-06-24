@@ -223,10 +223,11 @@ export default function Home() {
         <h4>Formatting</h4>
         <p>Format how the co-ordinates are copied!</p>
         <p>
-          Simply include the macros <b>#x</b> and <b>#y</b> which will be
-          substituted by the <i> x</i> and
+          Simply include the keys <b>#x</b> and <b>#y</b> which will be replaced
+          by the <i> x</i> and
           <i> y</i> co-ordinates, respectively.
         </p>
+
         <Editor
           value={code}
           onValueChange={handleCodeChange}
