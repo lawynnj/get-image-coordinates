@@ -38,7 +38,8 @@ export default function Home() {
         const rect = canvasRef.current.getBoundingClientRect();
         const x = parseInt(e.clientX - rect.left);
         const y = parseInt(e.clientY - rect.top);
-        var p = context.getImageData(x, y, 1, 1).data;
+        const p = context.getImageData(x, y, 1, 1).data;
+
         resultsRef.current.innerHTML =
           '<table style="width:100%;table-layout:fixed"><td>X: ' +
           x +
@@ -181,7 +182,9 @@ export default function Home() {
           />
         </div>
         {imgEl && (
-          <p className="mt-4">Click anywhere on the image copy coordinates!</p>
+          <p className="mt-4">
+            Click anywhere on the image to copy coordinates!
+          </p>
         )}
       </div>
     );
@@ -190,11 +193,11 @@ export default function Home() {
   const renderEditor = () => {
     return (
       <div className="editor-container mt-4">
-        <p>Format the copied co-ordinates!</p>
+        <p>Format how the co-ordinates are copied!</p>
         <p>
           Simply include the macros <b>#x</b> and <b>#y</b> which will be
           substituted by the <i> x</i> and
-          <i> y</i> co-ordinates, respectively
+          <i> y</i> co-ordinates, respectively.
         </p>
         <Editor
           value={code}
