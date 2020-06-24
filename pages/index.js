@@ -1,15 +1,27 @@
 import Head from "next/head";
 import { useState, useRef, useEffect } from "react";
 import BaseToast from "../components/Toast";
+import FileInput from "../components/FileInput";
 
 export default function Home() {
   const canvasRef = useRef();
   const resultsRef = useRef();
+  const notifTimeoutRef = useRef(false);
+
   const [form, setForm] = useState({ width: 0 });
   const [scale, setScale] = useState(false);
   const [imgEl, setImgEl] = useState(null);
   const [showCopyNotif, setShowCopyNotif] = useState(false);
   const [file, setFile] = useState(null);
+
+  // clear timeout
+  useEffect(() => {
+    return () => {
+      clearTimeout(notifTimeoutRef.current);
+    };
+  }, []);
+
+  // initialize canvas events
   useEffect(() => {
     if (canvasRef) {
       const { current } = canvasRef;
@@ -42,11 +54,17 @@ export default function Home() {
         const rect = canvasRef.current.getBoundingClientRect();
         const x = parseInt(e.clientX - rect.left);
         const y = parseInt(e.clientY - rect.top);
+
+        // TODO: allow user to format copy
         const copyText = x + ";" + y;
+
         navigator.clipboard.writeText(copyText).then(
           () => {
             setShowCopyNotif(true);
-            setTimeout(() => setShowCopyNotif(false), 2000);
+            notifTimeoutRef.current = setTimeout(
+              () => setShowCopyNotif(false),
+              3000
+            );
           },
           () => {}
         );
@@ -64,31 +82,42 @@ export default function Home() {
       if (scale) {
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         const sH = (imgEl.height / imgEl.width) * form.width;
+        canvasRef.current.width = form.width;
+        canvasRef.current.height = sH;
         context.drawImage(imgEl, 0, 0, form.width, sH);
       } else {
-        context.drawImage(imgEl, 0, 0);
+        draw(imgEl, context, imgEl.width, imgEl.height);
       }
     }
   }, [canvasRef, scale, imgEl]);
 
-  const handleUpload = (e) => {
-    setFile(e.target.files[0]);
-    const url = URL.createObjectURL(e.target.files[0]);
-    const img = new Image();
-    const context = canvasRef.current.getContext("2d");
-    img.src = url;
-    setImgEl(img);
-    img.onload = () => {
-      canvasRef.current.width = img.width;
-      canvasRef.current.height = img.height;
+  const draw = (img, context, w, h, sw = null, sh = null) => {
+    canvasRef.current.width = w;
+    canvasRef.current.height = h;
+    if (sw !== null && sh !== null) {
+      context.drawImage(img, 0, 0, sw, sh);
+    } else {
+      context.drawImage(img, 0, 0);
+    }
+  };
 
-      if (scale === true) {
-        const sH = (img.height / img.width) * form.width;
-        context.drawImage(img, 0, 0, form.width, sH);
-      } else {
-        context.drawImage(img, 0, 0);
-      }
-    };
+  const handleUpload = (e) => {
+    try {
+      setFile(e.target.files[0]);
+      const url = URL.createObjectURL(e.target.files[0]);
+      const img = new Image();
+      const context = canvasRef.current.getContext("2d");
+      img.src = url;
+      setImgEl(img);
+      img.onload = () => {
+        if (scale === true) {
+          const sH = (img.height / img.width) * form.width;
+          draw(img, context, img.width, img.height, form.width, sH);
+        } else {
+          draw(img, context, img.width, img.height);
+        }
+      };
+    } catch (error) {}
   };
 
   const toggleScale = () => {
@@ -101,6 +130,10 @@ export default function Home() {
     });
   };
 
+  const handleCloseNotif = () => {
+    setShowCopyNotif(false);
+    clearTimeout(notifTimeoutRef.current);
+  };
   return (
     <div>
       <Head>
@@ -109,41 +142,45 @@ export default function Home() {
       </Head>
 
       <main className="container-fluid">
-        <BaseToast show={showCopyNotif} text="Copied!" />
+        <BaseToast
+          show={showCopyNotif}
+          text="Copied!"
+          handleClose={handleCloseNotif}
+        />
         <div className="d-flex">
-          <div className="input-group mb-3 width-input mt-4">
-            <div className="custom-file">
-              <input id="file-upload" type="file" onChange={handleUpload} />
-              <label className="custom-file-label" htmlFor="file-upload">
-                Choose file
-              </label>
-              <p></p>
+          <div>
+            <div className="d-flex">
+              <FileInput onChange={handleUpload} className="width-input" />
+              <div className="d-flex align-items-center ml-3">
+                <span>{file ? file.name : ""}</span>
+              </div>
             </div>
+            <div className="input-group mb-3 width-input">
+              <div className="input-group-prepend">
+                <button
+                  className={`btn ${
+                    !scale ? "btn-info" : "btn-outline-secondary "
+                  }`}
+                  type="button"
+                  onClick={toggleScale}
+                  disabled={!imgEl || !form.width}
+                >
+                  {scale ? "Undo scale" : "Scale by width (px)"}
+                </button>
+              </div>
+              <input
+                type="number"
+                className="form-control "
+                value={form.width}
+                onChange={handleChange}
+                disabled={!imgEl}
+              />
+            </div>
+            <p>Click anywhere on the image copy coordinates!</p>
           </div>
-          <div className="d-flex align-items-center ml-3">
-            <span>{file ? file.name : ""}</span>
-          </div>
+          <div>Format the copy!</div>
         </div>
 
-        <div className="input-group mb-3 width-input">
-          <div className="input-group-prepend">
-            <button
-              className={`btn ${scale ? "btn-info" : "btn-outline-secondary "}`}
-              type="button"
-              onClick={toggleScale}
-            >
-              {scale ? "Unscale" : "Scale"} image
-            </button>
-          </div>
-
-          <input
-            type="number"
-            className="form-control "
-            placeholder="Enter a width here"
-            value={form.width}
-            onChange={handleChange}
-          />
-        </div>
         <canvas id="canvas" className="canvas" ref={canvasRef}></canvas>
         <div ref={resultsRef}>
           Move mouse over image to show mouse location and pixel value and alpha
@@ -153,10 +190,6 @@ export default function Home() {
       <style jsx>{`
         .canvas {
           margin: 12px;
-        }
-
-        .width-input {
-          width: 300px;
         }
 
         input[type="file"] {
@@ -197,6 +230,10 @@ export default function Home() {
 
         * {
           box-sizing: border-box;
+        }
+
+        .width-input {
+          width: 350px;
         }
       `}</style>
     </div>
