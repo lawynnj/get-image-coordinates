@@ -190,7 +190,7 @@ export default function Home() {
           <div className="input-group-prepend">
             <button
               className={`btn ${
-                !scale && form.width ? "btn-info" : "btn-outline-secondary "
+                !scale && form.width ? "btn-primary" : "btn-outline-secondary "
               }`}
               type="button"
               onClick={toggleScale}
@@ -264,7 +264,7 @@ export default function Home() {
           className="toast-container"
         />
         {renderTip()}
-        <div className="d-flex">
+        <div className="d-flex mb-2">
           {renderInputs()}
           {renderEditor()}
         </div>
