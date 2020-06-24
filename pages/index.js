@@ -190,10 +190,7 @@ export default function Home() {
     return (
       <div>
         <div className="d-flex">
-          <FileInput
-            onChange={handleUpload}
-            className="mt-4 mb-2 width-input"
-          />
+          <FileInput onChange={handleUpload} className="mt-4 mb-2" />
           <div className="d-flex align-items-center ml-3"></div>
         </div>
         <span>{file ? `Filename: ${file.name}` : ""}</span>
@@ -357,7 +354,7 @@ export default function Home() {
           box-sizing: border-box;
         }
         .width-input {
-          width: 300px;
+          max-width: 250px;
         }
 
         .toast-container {
