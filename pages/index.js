@@ -1,198 +1,163 @@
-import Head from 'next/head'
-
+import Head from "next/head";
+import { useState, useRef, useEffect } from "react";
+import BaseToast from "../components/Toast";
 export default function Home() {
+  const canvasRef = useRef();
+  const resultsRef = useRef();
+  const [form, setForm] = useState({ width: 0 });
+  const [scale, setScale] = useState(false);
+  const [imgEl, setImgEl] = useState(null);
+  const [showCopyNotif, setShowCopyNotif] = useState(false);
+  useEffect(() => {
+    if (canvasRef) {
+      const { current } = canvasRef;
+      const context = canvasRef.current.getContext("2d");
+
+      const mousePos = (e) => {
+        const rect = canvasRef.current.getBoundingClientRect();
+        const x = parseInt(e.clientX - rect.left);
+        const y = parseInt(e.clientY - rect.top);
+        var p = context.getImageData(x, y, 1, 1).data;
+        resultsRef.current.innerHTML =
+          '<table style="width:100%;table-layout:fixed"><td>X: ' +
+          x +
+          "</td><td>Y: " +
+          y +
+          "</td><td>Red: " +
+          p[0] +
+          "</td><td>Green: " +
+          p[1] +
+          "</td><td>Blue: " +
+          p[2] +
+          "</td><td>Alpha: " +
+          p[3] +
+          "</td></table>";
+        return { x, y };
+      };
+
+      // copy mouse positions
+      function handleClick(e) {
+        const rect = canvasRef.current.getBoundingClientRect();
+        const x = parseInt(e.clientX - rect.left);
+        const y = parseInt(e.clientY - rect.top);
+        const copyText = x + ";" + y;
+        navigator.clipboard.writeText(copyText).then(
+          () => {
+            setShowCopyNotif(true);
+            setTimeout(() => setShowCopyNotif(false), 2000);
+          },
+          () => {}
+        );
+      }
+
+      current.addEventListener("mousemove", mousePos, false);
+      current.addEventListener("click", handleClick, false);
+    }
+    return () => {};
+  }, [canvasRef]);
+
+  useEffect(() => {
+    const context = canvasRef.current.getContext("2d");
+    if (imgEl) {
+      if (scale) {
+        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+        const sH = (imgEl.height / imgEl.width) * form.width;
+        context.drawImage(imgEl, 0, 0, form.width, sH);
+      } else {
+        context.drawImage(imgEl, 0, 0);
+      }
+    }
+  }, [canvasRef, scale, imgEl]);
+
+  const handleUpload = (e) => {
+    const url = URL.createObjectURL(e.target.files[0]);
+    const img = new Image();
+    const context = canvasRef.current.getContext("2d");
+    img.src = url;
+    setImgEl(img);
+    img.onload = () => {
+      canvasRef.current.width = img.width;
+      canvasRef.current.height = img.height;
+
+      if (scale === true) {
+        const sH = (img.height / img.width) * form.width;
+        context.drawImage(img, 0, 0, form.width, sH);
+      } else {
+        context.drawImage(img, 0, 0);
+      }
+    };
+  };
+
+  const toggleScale = () => {
+    setScale(!scale);
+  };
+
+  const handleChange = (e) => {
+    setForm({
+      width: e.target.value,
+    });
+  };
+
   return (
-    <div className="container">
+    <div>
       <Head>
-        <title>Create Next App</title>
+        <title>Get Coords</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
-        <h1 className="title">
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className="description">
-          Get started by editing <code>pages/index.js</code>
+      <main className="container-fluid">
+        <BaseToast show={showCopyNotif} text="Copied!" />
+        <p>
+          Open image: <input type="file" onChange={handleUpload} />
         </p>
 
-        <div className="grid">
-          <a href="https://nextjs.org/docs" className="card">
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className="card">
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className="card"
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="card"
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+        <div className="input-group mb-3 width-input">
+          <div className="input-group-prepend">
+            <button
+              className={`btn ${scale ? "btn-info" : "btn-outline-secondary "}`}
+              type="button"
+              onClick={toggleScale}
+            >
+              {scale ? "Unscale" : "Scale"} image
+            </button>
+          </div>
+          <input
+            type="number"
+            className="form-control "
+            placeholder="Enter a width here"
+            value={form.width}
+            onChange={handleChange}
+          />
+        </div>
+        <canvas id="canvas" className="canvas" ref={canvasRef}></canvas>
+        <div ref={resultsRef}>
+          Move mouse over image to show mouse location and pixel value and alpha
         </div>
       </main>
 
-      <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="logo" />
-        </a>
-      </footer>
-
       <style jsx>{`
-        .container {
-          min-height: 100vh;
-          padding: 0 0.5rem;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
+        .canvas {
+          margin: 12px;
         }
 
-        main {
-          padding: 5rem 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
+        .width-input {
+          width: 300px;
         }
 
         footer {
-          width: 100%;
-          height: 100px;
-          border-top: 1px solid #eaeaea;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        footer img {
-          margin-left: 0.5rem;
-        }
-
-        footer a {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        a {
-          color: inherit;
-          text-decoration: none;
-        }
-
-        .title a {
-          color: #0070f3;
-          text-decoration: none;
-        }
-
-        .title a:hover,
-        .title a:focus,
-        .title a:active {
-          text-decoration: underline;
-        }
-
-        .title {
-          margin: 0;
-          line-height: 1.15;
-          font-size: 4rem;
-        }
-
-        .title,
-        .description {
-          text-align: center;
-        }
-
-        .description {
-          line-height: 1.5;
-          font-size: 1.5rem;
-        }
-
-        code {
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          font-size: 1.1rem;
-          font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
-            DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
-        }
-
-        .grid {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-wrap: wrap;
-
-          max-width: 800px;
-          margin-top: 3rem;
-        }
-
-        .card {
-          margin: 1rem;
-          flex-basis: 45%;
-          padding: 1.5rem;
-          text-align: left;
-          color: inherit;
-          text-decoration: none;
-          border: 1px solid #eaeaea;
-          border-radius: 10px;
-          transition: color 0.15s ease, border-color 0.15s ease;
-        }
-
-        .card:hover,
-        .card:focus,
-        .card:active {
-          color: #0070f3;
-          border-color: #0070f3;
-        }
-
-        .card h3 {
-          margin: 0 0 1rem 0;
-          font-size: 1.5rem;
-        }
-
-        .card p {
-          margin: 0;
-          font-size: 1.25rem;
-          line-height: 1.5;
-        }
-
-        .logo {
-          height: 1em;
-        }
-
-        @media (max-width: 600px) {
-          .grid {
-            width: 100%;
-            flex-direction: column;
-          }
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          margin: 0 auto;
+          background: #0072bb;
+          color: #fff;
         }
       `}</style>
 
       <style jsx global>{`
         html,
         body {
+          height: 100%;
           padding: 0;
           margin: 0;
           font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
@@ -205,5 +170,5 @@ export default function Home() {
         }
       `}</style>
     </div>
-  )
+  );
 }
