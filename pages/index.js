@@ -298,7 +298,7 @@ export default function Home() {
     );
   };
   return (
-    <Layout title="Home">
+    <div>
       <main className="container-fluid pt-4">
         <BaseToast
           show={showCopyNotif}
@@ -364,6 +364,6 @@ export default function Home() {
           z-index: 999;
         }
       `}</style>
-    </Layout>
+    </div>
   );
 }
