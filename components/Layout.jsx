@@ -8,7 +8,7 @@ export default function Layout(props) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <script
           async
-          src="https://www.googletagmanager.com/gtag/js?id=G-T9B0HX8LRG"
+          src="https://www.googletagmanager.com/gtag/js?id=G-Q9J5E2X1DS"
         ></script>
 
         <script
@@ -18,7 +18,7 @@ export default function Layout(props) {
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
 
-                gtag('config', 'G-T9B0HX8LRG');
+                gtag('config', 'G-Q9J5E2X1DS')
               `,
           }}
         />
