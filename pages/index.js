@@ -1,7 +1,6 @@
-import Head from "next/head";
 import { useState, useRef, useEffect } from "react";
 import BaseToast from "../components/BaseToast";
-import FileInput from "../components/FileInput";
+import Layout from "../components/Layout";
 import Editor from "react-simple-code-editor";
 import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-clike";
@@ -299,11 +298,7 @@ export default function Home() {
     );
   };
   return (
-    <div>
-      <Head>
-        <title>Get Coords</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <Layout title="Home">
       <main className="container-fluid pt-4">
         <BaseToast
           show={showCopyNotif}
@@ -369,6 +364,6 @@ export default function Home() {
           z-index: 999;
         }
       `}</style>
-    </div>
+    </Layout>
   );
 }
