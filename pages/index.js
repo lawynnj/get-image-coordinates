@@ -27,7 +27,6 @@ export default function Home() {
   const [imgEl, setImgEl] = useState(null);
   const [showTip, setShowTip] = useState(true);
   const [showCopyNotif, setShowCopyNotif] = useState(false);
-  const [file, setFile] = useState(null);
   const [data, setData] = useState({
     x: 0,
     y: 0,
@@ -123,7 +122,6 @@ export default function Home() {
 
   const handleUpload = (e) => {
     try {
-      setFile(e.target.files[0]);
       const url = URL.createObjectURL(e.target.files[0]);
       const img = new Image();
       const context = canvasRef.current.getContext("2d");
@@ -188,12 +186,13 @@ export default function Home() {
 
   const renderInputs = () => {
     return (
-      <div>
-        <div className="d-flex">
-          <FileInput onChange={handleUpload} className="mt-4 mb-2" />
-          <div className="d-flex align-items-center ml-3"></div>
-        </div>
-        <span>{file ? `Filename: ${file.name}` : ""}</span>
+      <div className="inputs-ctr d-flex flex-column align-items-center d-md-block">
+        <h4>Upload File</h4>
+        <input
+          type="file"
+          onChange={handleUpload}
+          className="my-2 width-input"
+        />
 
         <div className="input-group mt-2 width-input">
           <input
@@ -212,29 +211,62 @@ export default function Home() {
             </button>
           </div>
         </div>
-        <p className="mt-4">Click anywhere on the image to copy coordinates!</p>
+        <style jsx>{`
+          .inputs-ctr {
+            min-width: 350px;
+          }
+        `}</style>
       </div>
     );
   };
 
   const renderEditor = () => {
     return (
-      <div className="editor-container mt-4">
-        <div className="d-flex">
-          <div className="mr-2 px-4">
-            <h4>Format the copy</h4>
-            <p>
-              Update the text in the gray text field to update the format of the
-              copied the co-ordinates
-            </p>
-            <p>
-              When using your own format include the keys <b>#x</b> and{" "}
-              <b>#y</b>. They will be replaced by the <i> x</i> and
-              <i> y</i> co-ordinates, respectively.
-            </p>
+      <div className="editor-container d-flex flex-column align-items-center d-md-block px-4">
+        <h4>Formatting the copy</h4>
+        <p>
+          Update the text in the gray text field to update the format of the
+          copied the co-ordinates
+        </p>
+        <p>
+          When using your own format include the keys <b>#x</b> and <b>#y</b>.
+          They will be replaced by the <i> x</i> and
+          <i> y</i> co-ordinates, respectively.
+        </p>
+        <Editor
+          value={code}
+          onValueChange={handleCodeChange}
+          highlight={(code) => highlight(code, languages.js)}
+          padding={10}
+          style={{
+            fontFamily: '"Fira code", "Fira Mono", monospace',
+            fontSize: 12,
+            backgroundColor: "#ededed",
+            width: 250,
+            marginRight: 10,
+          }}
+        />
+
+        <style jsx>
+          {`
+            .editor-container {
+              z-index: 1;
+            }
+          `}
+        </style>
+      </div>
+    );
+  };
+
+  const renderEditorExamples = () => {
+    return (
+      <div className="d-flex flex-column align-items-center d-md-block">
+        <h4>Copy format example</h4>
+        <div className="d-flex flex-column flex-md-row flex-wrap">
+          <div>
+            <span>Format input: </span>
             <Editor
-              value={code}
-              onValueChange={handleCodeChange}
+              value={exampleFormat}
               highlight={(code) => highlight(code, languages.js)}
               padding={10}
               style={{
@@ -244,58 +276,28 @@ export default function Home() {
                 width: 250,
                 marginRight: 10,
               }}
+              disabled
             />
           </div>
-          <div className="px-4">
-            <h4>Copy format example</h4>
-            <div className="d-flex">
-              <div>
-                <span>Format input: </span>
-                <Editor
-                  value={exampleFormat}
-                  highlight={(code) => highlight(code, languages.js)}
-                  padding={10}
-                  style={{
-                    fontFamily: '"Fira code", "Fira Mono", monospace',
-                    fontSize: 12,
-                    backgroundColor: "#ededed",
-                    width: 250,
-                    marginRight: 10,
-                  }}
-                  disabled
-                />
-              </div>
-              <div>
-                <span>Copy Output:</span>
-                <Editor
-                  value={exampleFormat2}
-                  highlight={(code) => highlight(code, languages.js)}
-                  padding={10}
-                  style={{
-                    fontFamily: '"Fira code", "Fira Mono", monospace',
-                    fontSize: 12,
-                    backgroundColor: "#ededed",
-                    width: 250,
-                  }}
-                  disabled
-                />
-              </div>
-            </div>
+          <div className="mt-4 mt-md-0">
+            <span>Copy Output:</span>
+            <Editor
+              value={exampleFormat2}
+              highlight={(code) => highlight(code, languages.js)}
+              padding={10}
+              style={{
+                fontFamily: '"Fira code", "Fira Mono", monospace',
+                fontSize: 12,
+                backgroundColor: "#ededed",
+                width: 250,
+              }}
+              disabled
+            />
           </div>
         </div>
-
-        <style jsx>
-          {`
-            .editor-container {
-              margin-left: 50px;
-              z-index: 1;
-            }
-          `}
-        </style>
       </div>
     );
   };
-
   return (
     <div>
       <Head>
@@ -310,10 +312,16 @@ export default function Home() {
           className="toast-container"
         />
         {renderTip()}
-        <div className="d-flex mb-2">
-          {renderInputs()}
-          {renderEditor()}
+        <div className="row mb-2">
+          <div className="col-12 col-md-4 col-lg-3 mb-3">{renderInputs()}</div>
+          <div className="col-12 col-md-4 col-lg-5 my-4 my-md-0">
+            {renderEditor()}
+          </div>
+          <div className="col-12 col-md-4 col-lg-4 mt-4 mt-md-0">
+            {renderEditorExamples()}
+          </div>
         </div>
+        <p className="mt-4">Click anywhere on the image to copy coordinates!</p>
         <hr />
         <canvas id="canvas" ref={canvasRef}></canvas>
         <Form.Group controlId="formBasicCheckbox">
