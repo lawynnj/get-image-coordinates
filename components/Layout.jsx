@@ -6,7 +6,7 @@ export default function Layout(props) {
       <Head>
         <link rel="icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <script
+        {/* <script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-4DNC3188WT"
         ></script>
@@ -20,7 +20,7 @@ export default function Layout(props) {
                 gtag('config', 'G-4DNC3188WT');
               `,
           }}
-        />
+        /> */}
         <title>{props.title}</title>
       </Head>
       {props.children}
