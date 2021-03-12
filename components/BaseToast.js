@@ -3,7 +3,11 @@ import Toast from "react-bootstrap/Toast";
 const BaseToast = ({ show, text, handleClose, className }) => {
   return (
     <div className={`base-toast ${className}`}>
-      <Toast show={show} onClose={handleClose}>
+      <Toast
+        style={{ backgroundColor: "green" }}
+        show={show}
+        onClose={handleClose}
+      >
         <Toast.Header>
           <strong className="mr-auto">{text}</strong>
         </Toast.Header>
