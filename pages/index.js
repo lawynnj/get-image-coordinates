@@ -20,10 +20,10 @@ const exampleFormat2 = `{
 const RenderEditorTip = () => {
   return (
     <>
-      <h6>2. Formatting the copy</h6>
+      <h6>Formatting the copy</h6>
       <p>
-        Update the text in the text field under the "Copy Format" section to
-        update the format of the copied the co-ordinates
+        Update the text in the text editor under the "Enter the format of your
+        coordinates" section to update the format of the copy and paste format.
       </p>
       <p>
         When using your own format include the keys <b>#x</b> and <b>#y</b>{" "}
@@ -46,7 +46,6 @@ const RenderTip = ({ onClose }) => {
         <div className="row">
           <div className="col-12">
             <div className="d-flex">
-              <h4 className="d-inline">Tip</h4>
               <button
                 className="close ml-auto"
                 type="button"
@@ -58,16 +57,13 @@ const RenderTip = ({ onClose }) => {
             </div>
           </div>
           <div className="col-12">
-            <p>
-              Get Image Coordinates is a tool that allows you to get x and y
-              co-ordinates of an image by using your mouse. Simply upload an
-              image, adjust the width by adding a scale (optional), and click on
-              a point to copy co-ordinates. You can format how the co-ordinates
-              are copied in the editor.
-            </p>
-          </div>
-          <div className="col-12">
+            <h5 className="mt-2">Steps</h5>
             <h6>1. Upload an image</h6>
+            <h6>2. Adjust the width of the image by adding a scale</h6>
+            <h6>
+              3. Click anywhere on the image to copy co-ordinates. You can
+              format how the co-ordinates are copied in the editor.
+            </h6>
           </div>
           <div className="col-12 mt-3">
             <RenderEditorTip />
@@ -98,7 +94,7 @@ const RenderFileUpload = ({
 }) => {
   return (
     <div className="border rounded p-2 inputs-ctr d-flex flex-column align-items-center d-md-block">
-      <h4>Upload Image</h4>
+      <h4>1. Upload Image</h4>
       <input
         type="file"
         onChange={handleUpload}
@@ -119,7 +115,7 @@ const RenderFileUpload = ({
             type="button"
             onClick={toggleScale}
           >
-            {scale ? "Undo scale" : "Scale by width (px)"}
+            {scale ? "Undo scale" : "Scale width (px)"}
           </button>
         </div>
       </div>
@@ -136,7 +132,7 @@ const RenderEditorExamples = () => {
   return (
     <div className="d-flex flex-column flex-md-row flex-wrap">
       <div>
-        <span>Example Format:</span>
+        <span>Format:</span>
         <RenderEditor value={exampleFormat} disabled={true} />
       </div>
       <div className="mt-4 mt-md-0">
@@ -159,7 +155,7 @@ const RenderEditor = ({ disabled = false, value, handleCodeChange }) => {
         style={{
           fontFamily: '"Fira code", "Fira Mono", monospace',
           fontSize: 12,
-          backgroundColor: "#ededed",
+          backgroundColor: disabled ? "#fff" : "#ededed",
           width: 250,
           marginRight: 10,
         }}
@@ -183,7 +179,7 @@ export default function Home() {
   const [form, setForm] = useState({ width: 0, showColor: true });
   const [scale, setScale] = useState(false);
   const [imgEl, setImgEl] = useState(null);
-  const [showTip, setShowTip] = useState(true);
+  const [showTip, setShowTip] = useState(false);
   const [showCopyNotif, setShowCopyNotif] = useState(false);
   const [data, setData] = useState({
     x: 0,
@@ -194,12 +190,21 @@ export default function Home() {
     a: 0,
   });
   const [code, setCode] = useState(initCode);
+  const [pasteOutput, setPasteOutput] = useState("");
   // clear timeout
   useEffect(() => {
     return () => {
       clearTimeout(notifTimeoutRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    let tmp = code;
+    tmp = tmp.replace("#x", 100);
+    tmp = tmp.replace("#y", 100);
+    console.log(tmp);
+    setPasteOutput(tmp);
+  }, [code]);
 
   // initialize canvas events
   useEffect(() => {
@@ -338,8 +343,9 @@ export default function Home() {
         )}
 
         <h3>Get Image Coordinates</h3>
+        <p>An easy way to get x and y coordinates of an image.</p>
         <div className="row mt-4 mb-2">
-          <div className="col-12 col-md-6">
+          <div className="col-12">
             <RenderFileUpload
               width={form.width}
               scale={scale}
@@ -348,14 +354,37 @@ export default function Home() {
               handleChange={handleChange}
             />
           </div>
-          <div className="col-12 col-md-6">
-            <div className="border rounded p-2 editor-container d-flex flex-column align-items-center d-md-block px-4">
-              <h4>Copy Format</h4>
-              <RenderEditor value={code} handleCodeChange={handleCodeChange} />
+          <div className="col-12 mt-3">
+            <div className="border rounded p-2 editor-container d-flex flex-column align-items-center d-md-block p-4">
+              <h4>2. Enter the copy and paste format of the coordinates</h4>
+              <div className="d-flex flex-column flex-md-row flex-wrap">
+                <div>
+                  <p>Format</p>
+                  <RenderEditor
+                    value={code}
+                    handleCodeChange={handleCodeChange}
+                  />
+                </div>
+                <div>
+                  <p>Output</p>
+                  <RenderEditor value={pasteOutput} disabled={true} />
+                </div>
+              </div>
+
+              <h4 className="mt-4">Example</h4>
+              <RenderEditorExamples />
+            </div>
+          </div>
+          <div className="col-12 mt-3">
+            <div className="border rounded p-4">
+              <h4>
+                3. Click anywhere on the image to copy coordinates to the
+                clipboard!
+              </h4>
             </div>
           </div>
         </div>
-        <p className="mt-4">Click anywhere on the image to copy coordinates!</p>
+
         <hr />
         <canvas id="canvas" ref={canvasRef}></canvas>
         <Form.Group controlId="formBasicCheckbox">
