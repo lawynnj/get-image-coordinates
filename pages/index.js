@@ -158,38 +158,82 @@ export default function Home() {
     clearTimeout(notifTimeoutRef.current);
   };
 
-  const renderTip = () => {
-    if (showTip) {
-      return (
-        <div className="alert alert-light border">
-          <p>
-            Get image coordinates is a tool that allows you to get x and y
-            co-ordinates of an image by using your mouse. Simply upload an
-            image, adjust the width by adding a scale (optional), and click on a
-            point to copy co-ordinates. You can format how the co-ordinates are
-            copied in the editor.
-          </p>
-          <button
-            className="btn btn-outline-primary"
-            onClick={() => setShowTip(false)}
-          >
-            {" "}
-            Hide{" "}
-          </button>
-        </div>
-      );
-    }
-
-    return null;
+  const RenderEditorTip = () => {
+    return (
+      <>
+        <h6>2. Formatting the copy</h6>
+        <p>
+          Update the text in the text field under the "Copy Format" section to
+          update the format of the copied the co-ordinates
+        </p>
+        <p>
+          When using your own format include the keys <b>#x</b> and <b>#y</b>{" "}
+          which will be replaced by the <i> x</i> and
+          <i> y</i> co-ordinates, respectively.
+        </p>
+        <RenderEditor disabled={true} />
+      </>
+    );
   };
 
-  const renderInputs = () => {
+  const RenderTip = () => {
     return (
-      <div className="inputs-ctr d-flex flex-column align-items-center d-md-block">
-        <h4>Upload File</h4>
+      <div className="alert border">
+        <div className="container-fluid">
+          <div className="row">
+            <div className="col-12">
+              <div className="d-flex">
+                <h4 className="d-inline">Tip</h4>
+                <button
+                  className="close ml-auto"
+                  type="button"
+                  aria-label="Close"
+                  onClick={() => setShowTip(false)}
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            </div>
+            <div className="col-12">
+              <p>
+                Get Image Coordinates is a tool that allows you to get x and y
+                co-ordinates of an image by using your mouse. Simply upload an
+                image, adjust the width by adding a scale (optional), and click
+                on a point to copy co-ordinates. You can format how the
+                co-ordinates are copied in the editor.
+              </p>
+            </div>
+            <div className="col-12">
+              <h6>1. Upload an image</h6>
+            </div>
+            <div className="col-12 mt-3">
+              <RenderEditorTip />
+            </div>
+            <div className="col-12 mt-3">
+              <RenderEditorExamples />
+            </div>
+            <div className="col-12 mt-3">
+              <button
+                className="btn btn-outline-primary btn-sm"
+                onClick={() => setShowTip(false)}
+              >
+                Hide
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const RenderFileUpload = () => {
+    return (
+      <div className="border rounded p-2 inputs-ctr d-flex flex-column align-items-center d-md-block">
+        <h4>Upload Image</h4>
         <input
           type="file"
           onChange={handleUpload}
+          accept="image/*"
           className="my-2 width-input"
         />
 
@@ -219,20 +263,11 @@ export default function Home() {
     );
   };
 
-  const renderEditor = () => {
+  const RenderEditor = ({ disabled }) => {
     return (
-      <div className="editor-container d-flex flex-column align-items-center d-md-block px-4">
-        <h4>Formatting the copy</h4>
-        <p>
-          Update the text in the gray text field to update the format of the
-          copied the co-ordinates
-        </p>
-        <p>
-          When using your own format include the keys <b>#x</b> and <b>#y</b>.
-          They will be replaced by the <i> x</i> and
-          <i> y</i> co-ordinates, respectively.
-        </p>
+      <>
         <Editor
+          disabled={disabled}
           value={code}
           onValueChange={handleCodeChange}
           highlight={(code) => highlight(code, languages.js)}
@@ -253,17 +288,16 @@ export default function Home() {
             }
           `}
         </style>
-      </div>
+      </>
     );
   };
 
-  const renderEditorExamples = () => {
+  const RenderEditorExamples = () => {
     return (
       <div className="d-flex flex-column align-items-center d-md-block">
-        <h4>Copy format example</h4>
         <div className="d-flex flex-column flex-md-row flex-wrap">
           <div>
-            <span>Format input: </span>
+            <span>Example</span>
             <Editor
               value={exampleFormat}
               highlight={(code) => highlight(code, languages.js)}
@@ -306,14 +340,27 @@ export default function Home() {
           handleClose={handleCloseNotif}
           className="toast-container"
         />
-        {renderTip()}
-        <div className="row mb-2">
-          <div className="col-12 col-md-4 col-lg-3 mb-3">{renderInputs()}</div>
-          <div className="col-12 col-md-4 col-lg-5 my-4 my-md-0">
-            {renderEditor()}
+        {showTip ? (
+          <RenderTip />
+        ) : (
+          <button
+            className="float-right btn btn-outline-primary btn-sm"
+            onClick={() => setShowTip(true)}
+          >
+            Show tip
+          </button>
+        )}
+
+        <h3>Get Image Coordinates</h3>
+        <div className="row mt-4 mb-2">
+          <div className="col-12 col-md-6">
+            <RenderFileUpload />
           </div>
-          <div className="col-12 col-md-4 col-lg-4 mt-4 mt-md-0">
-            {renderEditorExamples()}
+          <div className="col-12 col-md-6">
+            <div className="border rounded p-2 editor-container d-flex flex-column align-items-center d-md-block px-4">
+              <h4>Copy Format</h4>
+              <RenderEditor />
+            </div>
           </div>
         </div>
         <p className="mt-4">Click anywhere on the image to copy coordinates!</p>
