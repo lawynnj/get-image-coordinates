@@ -17,6 +17,165 @@ const exampleFormat2 = `{
   coordinateY: 5
 }`;
 
+const RenderEditorTip = () => {
+  return (
+    <>
+      <h6>2. Formatting the copy</h6>
+      <p>
+        Update the text in the text field under the "Copy Format" section to
+        update the format of the copied the co-ordinates
+      </p>
+      <p>
+        When using your own format include the keys <b>#x</b> and <b>#y</b>{" "}
+        which will be replaced by the <i> x</i> and
+        <i> y</i> co-ordinates, respectively.
+      </p>
+      <RenderEditor
+        value={initCode}
+        handleCodeChange={() => ({})}
+        disabled={true}
+      />
+    </>
+  );
+};
+const RenderTip = ({ onClose }) => {
+  return (
+    <div className="alert border">
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-12">
+            <div className="d-flex">
+              <h4 className="d-inline">Tip</h4>
+              <button
+                className="close ml-auto"
+                type="button"
+                aria-label="Close"
+                onClick={onClose}
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          </div>
+          <div className="col-12">
+            <p>
+              Get Image Coordinates is a tool that allows you to get x and y
+              co-ordinates of an image by using your mouse. Simply upload an
+              image, adjust the width by adding a scale (optional), and click on
+              a point to copy co-ordinates. You can format how the co-ordinates
+              are copied in the editor.
+            </p>
+          </div>
+          <div className="col-12">
+            <h6>1. Upload an image</h6>
+          </div>
+          <div className="col-12 mt-3">
+            <RenderEditorTip />
+          </div>
+          <div className="col-12 mt-3">
+            <RenderEditorExamples />
+          </div>
+          <div className="col-12 mt-3">
+            <button
+              className="btn btn-outline-primary btn-sm"
+              onClick={onClose}
+            >
+              Hide
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const RenderFileUpload = ({
+  handleUpload,
+  handleChange,
+  toggleScale,
+  scale,
+  width,
+}) => {
+  return (
+    <div className="border rounded p-2 inputs-ctr d-flex flex-column align-items-center d-md-block">
+      <h4>Upload Image</h4>
+      <input
+        type="file"
+        onChange={handleUpload}
+        accept="image/*"
+        className="my-2 width-input"
+      />
+
+      <div className="input-group mt-2 width-input">
+        <input
+          type="number"
+          className="form-control"
+          value={width}
+          onChange={handleChange}
+        />
+        <div className="input-group-prepend">
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={toggleScale}
+          >
+            {scale ? "Undo scale" : "Scale by width (px)"}
+          </button>
+        </div>
+      </div>
+      <style jsx>{`
+        .inputs-ctr {
+          min-width: 350px;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+const RenderEditorExamples = () => {
+  return (
+    <div className="d-flex flex-column align-items-center d-md-block">
+      <div className="d-flex flex-column flex-md-row flex-wrap">
+        <div>
+          <span>Example</span>
+          <RenderEditor value={exampleFormat} disabled={true} />
+        </div>
+        <div className="mt-4 mt-md-0">
+          <span>Copy Output:</span>
+          <RenderEditor value={exampleFormat2} disabled={true} />
+        </div>
+      </div>
+    </div>
+  );
+};
+const RenderEditor = ({ disabled = false, value, handleCodeChange }) => {
+  return (
+    <>
+      <Editor
+        disabled={disabled}
+        value={value}
+        onValueChange={handleCodeChange}
+        highlight={(code) => highlight(code, languages.js)}
+        padding={10}
+        style={{
+          fontFamily: '"Fira code", "Fira Mono", monospace',
+          fontSize: 12,
+          backgroundColor: "#ededed",
+          width: 250,
+          marginRight: 10,
+        }}
+      />
+
+      <style jsx>
+        {`
+          .editor-container {
+            z-index: 1;
+          }
+        `}
+      </style>
+    </>
+  );
+};
+
 export default function Home() {
   const canvasRef = useRef();
   const notifTimeoutRef = useRef(false);
@@ -158,179 +317,6 @@ export default function Home() {
     clearTimeout(notifTimeoutRef.current);
   };
 
-  const RenderEditorTip = () => {
-    return (
-      <>
-        <h6>2. Formatting the copy</h6>
-        <p>
-          Update the text in the text field under the "Copy Format" section to
-          update the format of the copied the co-ordinates
-        </p>
-        <p>
-          When using your own format include the keys <b>#x</b> and <b>#y</b>{" "}
-          which will be replaced by the <i> x</i> and
-          <i> y</i> co-ordinates, respectively.
-        </p>
-        <RenderEditor disabled={true} />
-      </>
-    );
-  };
-
-  const RenderTip = () => {
-    return (
-      <div className="alert border">
-        <div className="container-fluid">
-          <div className="row">
-            <div className="col-12">
-              <div className="d-flex">
-                <h4 className="d-inline">Tip</h4>
-                <button
-                  className="close ml-auto"
-                  type="button"
-                  aria-label="Close"
-                  onClick={() => setShowTip(false)}
-                >
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-            </div>
-            <div className="col-12">
-              <p>
-                Get Image Coordinates is a tool that allows you to get x and y
-                co-ordinates of an image by using your mouse. Simply upload an
-                image, adjust the width by adding a scale (optional), and click
-                on a point to copy co-ordinates. You can format how the
-                co-ordinates are copied in the editor.
-              </p>
-            </div>
-            <div className="col-12">
-              <h6>1. Upload an image</h6>
-            </div>
-            <div className="col-12 mt-3">
-              <RenderEditorTip />
-            </div>
-            <div className="col-12 mt-3">
-              <RenderEditorExamples />
-            </div>
-            <div className="col-12 mt-3">
-              <button
-                className="btn btn-outline-primary btn-sm"
-                onClick={() => setShowTip(false)}
-              >
-                Hide
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const RenderFileUpload = () => {
-    return (
-      <div className="border rounded p-2 inputs-ctr d-flex flex-column align-items-center d-md-block">
-        <h4>Upload Image</h4>
-        <input
-          type="file"
-          onChange={handleUpload}
-          accept="image/*"
-          className="my-2 width-input"
-        />
-
-        <div className="input-group mt-2 width-input">
-          <input
-            type="number"
-            className="form-control"
-            value={form.width}
-            onChange={handleChange}
-          />
-          <div className="input-group-prepend">
-            <button
-              className="btn btn-primary"
-              type="button"
-              onClick={toggleScale}
-            >
-              {scale ? "Undo scale" : "Scale by width (px)"}
-            </button>
-          </div>
-        </div>
-        <style jsx>{`
-          .inputs-ctr {
-            min-width: 350px;
-          }
-        `}</style>
-      </div>
-    );
-  };
-
-  const RenderEditor = ({ disabled }) => {
-    return (
-      <>
-        <Editor
-          disabled={disabled}
-          value={code}
-          onValueChange={handleCodeChange}
-          highlight={(code) => highlight(code, languages.js)}
-          padding={10}
-          style={{
-            fontFamily: '"Fira code", "Fira Mono", monospace',
-            fontSize: 12,
-            backgroundColor: "#ededed",
-            width: 250,
-            marginRight: 10,
-          }}
-        />
-
-        <style jsx>
-          {`
-            .editor-container {
-              z-index: 1;
-            }
-          `}
-        </style>
-      </>
-    );
-  };
-
-  const RenderEditorExamples = () => {
-    return (
-      <div className="d-flex flex-column align-items-center d-md-block">
-        <div className="d-flex flex-column flex-md-row flex-wrap">
-          <div>
-            <span>Example</span>
-            <Editor
-              value={exampleFormat}
-              highlight={(code) => highlight(code, languages.js)}
-              padding={10}
-              style={{
-                fontFamily: '"Fira code", "Fira Mono", monospace',
-                fontSize: 12,
-                backgroundColor: "#ededed",
-                width: 250,
-                marginRight: 10,
-              }}
-              disabled
-            />
-          </div>
-          <div className="mt-4 mt-md-0">
-            <span>Copy Output:</span>
-            <Editor
-              value={exampleFormat2}
-              highlight={(code) => highlight(code, languages.js)}
-              padding={10}
-              style={{
-                fontFamily: '"Fira code", "Fira Mono", monospace',
-                fontSize: 12,
-                backgroundColor: "#ededed",
-                width: 250,
-              }}
-              disabled
-            />
-          </div>
-        </div>
-      </div>
-    );
-  };
   return (
     <Layout title="Home">
       <main className="container-fluid pt-4">
@@ -341,7 +327,7 @@ export default function Home() {
           className="toast-container"
         />
         {showTip ? (
-          <RenderTip />
+          <RenderTip onClose={() => setShowTip(false)} />
         ) : (
           <button
             className="float-right btn btn-outline-primary btn-sm"
@@ -354,12 +340,18 @@ export default function Home() {
         <h3>Get Image Coordinates</h3>
         <div className="row mt-4 mb-2">
           <div className="col-12 col-md-6">
-            <RenderFileUpload />
+            <RenderFileUpload
+              width={form.width}
+              scale={scale}
+              toggleScale={toggleScale}
+              handleUpload={handleUpload}
+              handleChange={handleChange}
+            />
           </div>
           <div className="col-12 col-md-6">
             <div className="border rounded p-2 editor-container d-flex flex-column align-items-center d-md-block px-4">
               <h4>Copy Format</h4>
-              <RenderEditor />
+              <RenderEditor value={code} handleCodeChange={handleCodeChange} />
             </div>
           </div>
         </div>
