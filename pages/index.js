@@ -38,6 +38,7 @@ const RenderEditorTip = () => {
     </>
   );
 };
+
 const RenderTip = ({ onClose }) => {
   return (
     <div className="alert border">
@@ -133,20 +134,19 @@ const RenderFileUpload = ({
 
 const RenderEditorExamples = () => {
   return (
-    <div className="d-flex flex-column align-items-center d-md-block">
-      <div className="d-flex flex-column flex-md-row flex-wrap">
-        <div>
-          <span>Example</span>
-          <RenderEditor value={exampleFormat} disabled={true} />
-        </div>
-        <div className="mt-4 mt-md-0">
-          <span>Copy Output:</span>
-          <RenderEditor value={exampleFormat2} disabled={true} />
-        </div>
+    <div className="d-flex flex-column flex-md-row flex-wrap">
+      <div>
+        <span>Example Format:</span>
+        <RenderEditor value={exampleFormat} disabled={true} />
+      </div>
+      <div className="mt-4 mt-md-0">
+        <span>Output:</span>
+        <RenderEditor value={exampleFormat2} disabled={true} />
       </div>
     </div>
   );
 };
+
 const RenderEditor = ({ disabled = false, value, handleCodeChange }) => {
   return (
     <>
