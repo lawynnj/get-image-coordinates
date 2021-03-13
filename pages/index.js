@@ -14,7 +14,7 @@ const exampleFormat = `{
 
 const exampleFormat2 = `{
   coordinateX: 3,
-  coordinateY: 5
+  coordinateY: 10
 }`;
 
 const RenderEditorTip = () => {
@@ -22,12 +22,12 @@ const RenderEditorTip = () => {
     <>
       <h6>Formatting the copy</h6>
       <p>
-        Update the text in the text editor under the "Enter the format of your
-        coordinates" section to update the format of the copy and paste format.
+        Change the format of the copied object in the text editor in step 2
+        below.
       </p>
       <p>
-        When using your own format include the keys <b>#x</b> and <b>#y</b>{" "}
-        which will be replaced by the <i> x</i> and
+        Please include the macros <b>#x</b> and <b>#y</b> if you change the
+        format. They will be replaced by the <i> x</i> and
         <i> y</i> co-ordinates, respectively.
       </p>
       <RenderEditor
@@ -45,25 +45,22 @@ const RenderTip = ({ onClose }) => {
       <div className="container-fluid">
         <div className="row">
           <div className="col-12">
-            <div className="d-flex">
-              <button
-                className="close ml-auto"
-                type="button"
-                aria-label="Close"
-                onClick={onClose}
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
+            <button
+              className="close ml-auto"
+              type="button"
+              aria-label="Close"
+              onClick={onClose}
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
           <div className="col-12">
-            <h5 className="mt-2">Steps</h5>
-            <h6>1. Upload an image</h6>
-            <h6>2. Adjust the width of the image by adding a scale</h6>
-            <h6>
-              3. Click anywhere on the image to copy co-ordinates. You can
-              format how the co-ordinates are copied in the editor.
-            </h6>
+            <h5>Steps</h5>
+            <p>1. Upload an image and adjust the width.</p>
+            <p>
+              2. Click anywhere on the image to copy coordinates. Format the
+              object that is copied in the <b>editor</b> in step 2 below.
+            </p>
           </div>
           <div className="col-12 mt-3">
             <RenderEditorTip />
@@ -94,7 +91,7 @@ const RenderFileUpload = ({
 }) => {
   return (
     <div className="border rounded p-2 inputs-ctr d-flex flex-column align-items-center d-md-block">
-      <h4>1. Upload Image</h4>
+      <h5>1. Upload Image</h5>
       <input
         type="file"
         onChange={handleUpload}
@@ -115,7 +112,7 @@ const RenderFileUpload = ({
             type="button"
             onClick={toggleScale}
           >
-            {scale ? "Undo scale" : "Scale width (px)"}
+            {scale ? "Undo" : "Adjust width (px)"}
           </button>
         </div>
       </div>
@@ -191,6 +188,7 @@ export default function Home() {
   });
   const [code, setCode] = useState(initCode);
   const [pasteOutput, setPasteOutput] = useState("");
+  const [toggleExample, setToggleExample] = useState(false);
   // clear timeout
   useEffect(() => {
     return () => {
@@ -331,19 +329,22 @@ export default function Home() {
           handleClose={handleCloseNotif}
           className="toast-container"
         />
-        {showTip ? (
-          <RenderTip onClose={() => setShowTip(false)} />
-        ) : (
-          <button
-            className="float-right btn btn-outline-primary btn-sm"
-            onClick={() => setShowTip(true)}
-          >
-            Show tip
-          </button>
-        )}
+        {/* navbar */}
+        <div className="float-right">
+          {showTip ? (
+            <RenderTip onClose={() => setShowTip(false)} />
+          ) : (
+            <button
+              className="btn btn-outline-primary btn-sm"
+              onClick={() => setShowTip(true)}
+            >
+              Show tip
+            </button>
+          )}
+        </div>
 
-        <h3>Get Image Coordinates</h3>
-        <p>An easy way to get x and y coordinates of an image.</p>
+        <h4>An easy way to get x and y coordinates of an image.</h4>
+
         <div className="row mt-4 mb-2">
           <div className="col-12">
             <RenderFileUpload
@@ -356,23 +357,32 @@ export default function Home() {
           </div>
           <div className="col-12 mt-3">
             <div className="border rounded p-2 editor-container d-flex flex-column align-items-center d-md-block p-4">
-              <h4>2. Enter the copy and paste format of the coordinates</h4>
+              <h5>2. Editor - Change the copy and paste format</h5>
               <div className="d-flex flex-column flex-md-row flex-wrap">
                 <div>
-                  <p>Format</p>
+                  <p>Editor:</p>
                   <RenderEditor
                     value={code}
                     handleCodeChange={handleCodeChange}
                   />
                 </div>
-                <div>
-                  <p>Output (when you paste)</p>
+                <div className="">
+                  <p>Copy and paste output:</p>
                   <RenderEditor value={pasteOutput} disabled={true} />
                 </div>
               </div>
-
-              <h4 className="mt-4">Example</h4>
-              <RenderEditorExamples />
+              <button
+                className="btn btn-outline-primary btn-sm mt-4"
+                onClick={() => setToggleExample((val) => !val)}
+              >
+                {toggleExample ? "Hide" : "See"} Example
+              </button>
+              {toggleExample && (
+                <>
+                  <h4 className="mt-1">Example</h4>
+                  <RenderEditorExamples />
+                </>
+              )}
             </div>
           </div>
           <div className="col-12 mt-3">
