@@ -330,7 +330,6 @@ export default function Home() {
           handleClose={handleCloseNotif}
           className="toast-container"
         />
-        {/* navbar */}
         <div className="float-right">
           {showTip ? (
             <RenderTip onClose={() => setShowTip(false)} />
