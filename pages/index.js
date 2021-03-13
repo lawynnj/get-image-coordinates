@@ -6,6 +6,7 @@ import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
 import Form from "react-bootstrap/Form";
+
 const initCode = `[#x, #y]`;
 const exampleFormat = `{
   coordinateX: #x,
@@ -90,7 +91,7 @@ const RenderFileUpload = ({
   width,
 }) => {
   return (
-    <div className="border rounded p-2 inputs-ctr d-flex flex-column align-items-center d-md-block">
+    <div className="border rounded p-4 inputs-ctr d-flex flex-column align-items-center d-md-block">
       <h5>1. Upload Image</h5>
       <input
         type="file"
@@ -356,7 +357,7 @@ export default function Home() {
             />
           </div>
           <div className="col-12 mt-3">
-            <div className="border rounded p-2 editor-container d-flex flex-column align-items-center d-md-block p-4">
+            <div className="border rounded editor-container d-flex flex-column align-items-center d-md-block p-4">
               <h5>2. Editor - Change the copy and paste format</h5>
               <div className="d-flex flex-column flex-md-row flex-wrap">
                 <div>

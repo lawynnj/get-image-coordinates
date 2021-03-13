@@ -7,7 +7,7 @@ import { Github } from "react-bootstrap-icons";
 export default () => {
   return (
     <div>
-      <BsNavbar bg="light" variant="light">
+      <BsNavbar bg="dark" variant="dark">
         <BsNavbar.Brand>Get Image Coordinates</BsNavbar.Brand>
         <Nav className="mr-auto">
           <Link href="/" passHref>
