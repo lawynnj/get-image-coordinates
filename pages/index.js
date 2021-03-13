@@ -366,7 +366,7 @@ export default function Home() {
                   />
                 </div>
                 <div>
-                  <p>Output</p>
+                  <p>Output (when you paste)</p>
                   <RenderEditor value={pasteOutput} disabled={true} />
                 </div>
               </div>
@@ -386,27 +386,31 @@ export default function Home() {
         </div>
 
         <hr />
+
         <canvas id="canvas" ref={canvasRef}></canvas>
-        <Form.Group controlId="formBasicCheckbox">
-          <Form.Check
-            type="checkbox"
-            label="Show colors"
-            onChange={() => setForm({ ...form, showColor: !form.showColor })}
-            checked={form.showColor}
-          />
-        </Form.Group>
-        <div>
-          <div className="d-flex w-50">
-            <div>X: {data.x} </div>
-            <div className="ml-4">Y: {data.y} </div>
-            {form.showColor && (
-              <>
-                <div className="ml-4">Red: {data.r} </div>
-                <div className="ml-4">Green: {data.g} </div>
-                <div className="ml-4">Blue: {data.b} </div>
-                <div className="ml-4">Alpha: {data.a} </div>
-              </>
-            )}
+        <div style={{ height: 90 }}></div>
+        <div className="coordinate-footer">
+          <Form.Group controlId="formBasicCheckbox">
+            <Form.Check
+              type="checkbox"
+              label="Show colors"
+              onChange={() => setForm({ ...form, showColor: !form.showColor })}
+              checked={form.showColor}
+            />
+          </Form.Group>
+          <div>
+            <div className="d-flex w-50 ">
+              <div>X: {data.x} </div>
+              <div className="ml-4">Y: {data.y} </div>
+              {form.showColor && (
+                <>
+                  <div className="ml-4">Red: {data.r} </div>
+                  <div className="ml-4">Green: {data.g} </div>
+                  <div className="ml-4">Blue: {data.b} </div>
+                  <div className="ml-4">Alpha: {data.a} </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </main>
@@ -427,7 +431,12 @@ export default function Home() {
         .width-input {
           max-width: 250px;
         }
-
+        .coordinate-footer {
+          position: fixed;
+          bottom: 0;
+          background-color: white;
+          width: 100%;
+        }
         .toast-container {
           z-index: 999;
         }
